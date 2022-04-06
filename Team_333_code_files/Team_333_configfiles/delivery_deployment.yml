@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flaskapp-delivery
+  labels:
+    app: flask-delivery
+spec:
+  selector:
+    matchLabels:
+      app: flask-delivery
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: flask-delivery
+    spec:
+      containers:
+      - name: flaskapp-delivery
+        image: team333/delivery:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8000
+      volumes:
+      - name: ca-certs
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: flaskapp-delivery
+  labels:
+    app: flask-delivery
+spec:
+  ports:
+  - port: 8002
+    protocol: TCP
+    name: flask
+    nodePort: 30750
+    targetPort: 8000
+  selector:
+    app: flask-delivery
+  type: NodePort
+

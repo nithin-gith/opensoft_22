@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flaskapp-orders
+  labels:
+    app: flask-orders
+spec:
+  selector:
+    matchLabels:
+      app: flask-orders
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: flask-orders
+    spec:
+      containers:
+      - name: flaskapp-orders
+        image: team333/orders:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8000
+      volumes:
+      - name: ca-certs
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: flaskapp-orders
+  labels:
+    app: flask-orders
+spec:
+  ports:
+  - port: 8001
+    protocol: TCP
+    name: flask
+    nodePort: 30749
+    targetPort: 8000
+  selector:
+    app: flask-orders
+  type: NodePort
+

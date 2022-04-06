@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sms-service
+  labels:
+    app: sms-service
+spec:
+  selector:
+    matchLabels:
+      app: sms-service
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: sms-service
+    spec:
+      containers:
+      - name: sms-service-app
+        image: team333/sms-service:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 3123
+      volumes:
+      - name: ca-certs
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sms-service
+  labels:
+    app: sms-service
+spec:
+  ports:
+  - port: 3123
+    protocol: TCP
+    name: sms-service
+    targetPort: 3123
+    nodePort: 30020
+  selector:
+    app: sms-service
+  type: NodePort
